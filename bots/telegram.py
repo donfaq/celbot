@@ -13,7 +13,7 @@ from bots.utils import CeleryWrapper
 logger = logging.getLogger(__name__)
 
 BOT_TOKEN = str(os.getenv("TELEGRAM_TOKEN", "token"))
-PUBLIC_PORT = int(os.getenv("TELEGRAM_PORT", '8080'))
+PUBLIC_PORT = int(os.getenv("PORT", '8080'))
 PUBLIC_URL = os.getenv("PUBLIC_URL", "localhost")
 DEVELOPER_CHAT_ID = int(os.getenv("DEV_CHAT_ID", 998969))
 
