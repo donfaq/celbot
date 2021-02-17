@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from bots import DiscordBot
+from bots import DiscordBot, start_telegram_bot
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
@@ -20,6 +20,6 @@ if __name__ == '__main__':
         client = DiscordBot(broker_uri=os.getenv("REDIS_URL"))
         client.run(os.getenv("DISCORD_TOKEN"))
     elif args.bot == "telegram":
-        pass
+        start_telegram_bot()
     else:
         pass
