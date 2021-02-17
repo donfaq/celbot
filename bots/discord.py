@@ -12,7 +12,7 @@ class DiscordBot(discord.Client):
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def on_message(self, message: discord.Message):
-        self.logger.info("Message hit. Author: %s. Channel %s", message.author.name, message.channel)
+        self.logger.info("MSG [%s#%s] %s - %s", message.guild, message.channel, message.author.name, message.content)
         if message.author.name != self.user.name:
             await message.channel.send(
                 self.celery.greet(message.author.name)
