@@ -1,7 +1,10 @@
 import argparse
+import logging
 import os
 
 from bots import DiscordBot
+
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
 
 def arguments() -> argparse.Namespace:
