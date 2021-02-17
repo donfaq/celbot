@@ -14,7 +14,7 @@ if __name__ == '__main__':
     args = arguments()
 
     if args.bot == "discord":
-        client = DiscordBot(broker_uri=os.getenv("CELERY_BROKER_URI"))
+        client = DiscordBot(broker_uri=os.getenv("REDIS_URL"))
         client.run(os.getenv("DISCORD_TOKEN"))
     elif args.bot == "telegram":
         pass

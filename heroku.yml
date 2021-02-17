@@ -1,3 +1,2 @@
 run:
-  celery: celery -A engine.main worker -l INFO
-  discord: python main.py discord
+  worker: start.sh

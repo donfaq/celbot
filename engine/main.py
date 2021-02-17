@@ -6,8 +6,8 @@ from engine.tasks import GreetingTask
 
 app = Celery(
     'engine',
-    broker=os.getenv("CELERY_BROKER_URI"),
-    backend=os.getenv("CELERY_BROKER_URI"),
+    broker=os.getenv("REDIS_URL"),
+    backend=os.getenv("REDIS_URL"),
     include=['engine.tasks']
 )
 app.conf.update(
