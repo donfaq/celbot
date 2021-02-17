@@ -15,7 +15,15 @@ click-repl==0.1.6
 cryptography==3.4.6
 discord.py==1.6.0
 idna==3.1
+irc==19.0.1
+jaraco.classes==3.2.0
+jaraco.collections==3.2.0
+jaraco.functools==3.2.0
+jaraco.logging==3.1.0
+jaraco.stream==3.0.0
+jaraco.text==3.5.0
 kombu==5.0.2
+more-itertools==8.7.0
 multidict==5.1.0
 prompt-toolkit==3.0.16
 pycparser==2.20
@@ -23,6 +31,7 @@ python-telegram-bot==13.2
 pytz==2021.1
 redis==3.5.3
 six==1.15.0
+tempora==4.0.1
 tornado==6.1
 typing-extensions==3.7.4.3
 tzlocal==2.1
