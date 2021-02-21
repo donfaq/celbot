@@ -86,7 +86,7 @@ class BreakingMadTask(Task):
 
     def _download_popular_page(self, n=1) -> str:
         url = "http://breakingmad.me/ru/popular/"
-        logger.info("Executing GET to %s", url)
+        logger.info("Executing GET to %s?page=n", url, n)
         res = ""
         r = requests.get(url, params=dict(page=n))
         if r.ok:
