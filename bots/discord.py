@@ -13,7 +13,11 @@ class DiscordBot(discord.Client):
 
     async def on_message(self, message: discord.Message):
         self.logger.info("MSG:[%s#%s@%s]:'%s'", message.guild, message.channel, message.author.name, message.content)
-        if message.author.name != self.user.name:
-            await message.channel.send(
-                self.celery.greet(message.author.name)
-            )
+        # we do not want the bot to reply to itself
+        if message.author.id == self.user.id:
+            return
+
+        if message.content.startswith('!news'):
+            await message.reply(self.celery.news())
+        if message.content.startswith("!joke"):
+            await message.reply(self.celery.joke())

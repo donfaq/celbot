@@ -51,11 +51,11 @@ def greet_callback(update: Update, context: CallbackContext) -> None:
 
 
 def joke_callback(update: Update, context: CallbackContext) -> None:
-    update.message.reply_to_message.reply_text(celery.joke())
+    update.message.reply_text(celery.joke(), reply_to_message_id=update.message.message_id)
 
 
 def news_callback(update: Update, context: CallbackContext) -> None:
-    update.message.reply_to_message.reply_text(celery.news())
+    update.message.reply_text(celery.news(), reply_to_message_id=update.message.message_id)
 
 
 def create_bot() -> Updater:
