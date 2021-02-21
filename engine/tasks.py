@@ -1,5 +1,6 @@
 import secrets
 
+import cachetools.func
 import ftfy
 import requests
 from bs4 import BeautifulSoup
@@ -49,24 +50,22 @@ class HaikuDetector(Task):
 class AnekdotTask(Task):
     name = "anekdot"
 
-    def __init__(self):
-        self.base_url = "https://www.anekdot.ru/"
+    @cachetools.func.ttl_cache(maxsize=10, ttl=6000)
+    def _get_random_anekdots(self):
+        def parse_html(text):
+            return list(map(lambda x: x.text, BeautifulSoup(text, features="html.parser").select("div[class=text]")))
+
+        res = []
+        r = requests.get("https://www.anekdot.ru/random/anekdot/", headers={"User-Agent": "Mozilla/5.0"})
+        if r.ok:
+            res = parse_html(r.text)
+        return res
 
     def _get_text(self):
         res = None
         anekdots = self._get_random_anekdots()
         if anekdots:
             res = rand_choice(anekdots)
-        return res
-
-    def _get_random_anekdots(self):
-        def parse_html(text):
-            return list(map(lambda x: x.text, BeautifulSoup(text, features="html.parser").select("div[class=text]")))
-
-        res = []
-        r = requests.get(self.base_url + "random/anekdot/", headers={"User-Agent": "Mozilla/5.0"})
-        if r.ok:
-            res = parse_html(r.text)
         return res
 
     def run(self):
@@ -85,16 +84,16 @@ class AnekdotTask(Task):
 class BreakingMadTask(Task):
     name = "breaking_mad"
 
-    def __init__(self):
-        self.base_url = "http://breakingmad.me/ru/"
-
     def _download_popular_page(self, n=1) -> str:
+        url = "http://breakingmad.me/ru/popular/"
+        logger.info("Executing GET to %s", url)
         res = ""
-        r = requests.get(self.base_url + "popular/", params=dict(page=n))
+        r = requests.get(url, params=dict(page=n))
         if r.ok:
             res = r.text
         return res
 
+    @cachetools.func.ttl_cache(maxsize=10, ttl=6000)
     def _extract_news(self, raw_html):
         soup = BeautifulSoup(raw_html, features="html.parser")
 
