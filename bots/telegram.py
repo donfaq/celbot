@@ -6,7 +6,7 @@ import os
 import traceback
 
 from telegram import Update, ParseMode
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, Dispatcher
+from telegram.ext import Updater, CommandHandler, CallbackContext, Dispatcher
 
 from bots.utils import CeleryWrapper
 
@@ -50,12 +50,21 @@ def greet_callback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(celery.greet(update.message.from_user.name))
 
 
+def joke_callback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(celery.joke())
+
+
+def news_callback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(celery.news())
+
+
 def create_bot() -> Updater:
     """Start the bot."""
     updater = Updater(BOT_TOKEN, use_context=True)
     dp: Dispatcher = updater.dispatcher
     dp.add_handler(CommandHandler("start", bot_start_callback))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, greet_callback))
+    dp.add_handler(CommandHandler("joke", joke_callback))
+    dp.add_handler(CommandHandler("news", news_callback))
     dp.add_error_handler(error_callback)
     return updater
 

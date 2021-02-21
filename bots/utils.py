@@ -7,3 +7,9 @@ class CeleryWrapper:
 
     def greet(self, name):
         return self.celery.send_task("greet", args=[name]).get()
+
+    def joke(self):
+        return self.celery.send_task("anekdot").get()
+
+    def news(self):
+        return self.celery.send_task("breaking_mad").get()

@@ -1,8 +1,17 @@
+import secrets
+
+import ftfy
+import requests
+from bs4 import BeautifulSoup
 from celery import Task
 from celery.utils.log import get_task_logger
 from rusyll import rusyll
 
 logger = get_task_logger(__name__)
+
+
+def rand_choice(seq):
+    return secrets.SystemRandom().choice(seq)
 
 
 class GreetingTask(Task):
@@ -14,12 +23,9 @@ class GreetingTask(Task):
 
 
 class HaikuDetector(Task):
-    name = "haiku_detector"
+    name = "haiku"
 
     def run(self, text):
-        return self.get_haiku(text)
-
-    def get_haiku(self, text):
         max_syllables = (5, 7, 5)
         n_syllables = rusyll.token_to_syllables(text)
 
@@ -39,3 +45,80 @@ class HaikuDetector(Task):
             return '\n'.join(map(lambda line: ' '.join(line), haiku))
         return None
 
+
+class AnekdotTask(Task):
+    name = "anekdot"
+
+    def __init__(self):
+        self.base_url = "https://www.anekdot.ru/"
+
+    def _get_text(self):
+        res = None
+        anekdots = self._get_random_anekdots()
+        if anekdots:
+            res = rand_choice(anekdots)
+        return res
+
+    def _get_random_anekdots(self):
+        def parse_html(text):
+            return list(map(lambda x: x.text, BeautifulSoup(text, features="html.parser").select("div[class=text]")))
+
+        res = []
+        r = requests.get(self.base_url + "random/anekdot/", headers={"User-Agent": "Mozilla/5.0"})
+        if r.ok:
+            res = parse_html(r.text)
+        return res
+
+    def run(self):
+        text = None
+        tries = 0
+        while tries < 5:
+            text = self._get_text()
+            if text is not None and len(text.encode('utf-8')) < 400:
+                break
+            tries += 1
+        if text is None:
+            text = "no u"
+        return text
+
+
+class BreakingMadTask(Task):
+    name = "breaking_mad"
+
+    def __init__(self):
+        self.base_url = "http://breakingmad.me/ru/"
+
+    def _download_popular_page(self, n=1) -> str:
+        res = ""
+        r = requests.get(self.base_url + "popular/", params=dict(page=n))
+        if r.ok:
+            res = r.text
+        return res
+
+    def _extract_news(self, raw_html):
+        soup = BeautifulSoup(raw_html, features="html.parser")
+
+        texts = list(
+            map(lambda t: ftfy.fix_encoding(t), map(lambda x: x.text, soup.select("div[class=news-row] > h2"))))
+        links = list(map(lambda l: l['href'], soup.select("div[class=news-row] span[href]")))
+
+        return [' '.join([t, l]) for t, l in zip(texts, links)]
+
+    def _get_random_news(self):
+        res = None
+        candidate_news = []
+        for n in range(5):
+            candidate_news += self._extract_news(self._download_popular_page(n))
+
+        if candidate_news:
+            candidate_news = list(set(candidate_news))
+            res = rand_choice(candidate_news)
+
+        return res
+
+    def run(self):
+        text = "Новостей не нашлось :("
+        res = self._get_random_news()
+        if res:
+            text = res
+        return text

@@ -3,6 +3,7 @@ amqp==5.0.5
 APScheduler==3.6.3
 async-timeout==3.0.1
 attrs==20.3.0
+beautifulsoup4==4.9.3
 billiard==3.6.3.0
 celery==5.0.5
 certifi==2020.12.5
@@ -14,7 +15,8 @@ click-plugins==1.1.1
 click-repl==0.1.6
 cryptography==3.4.6
 discord.py==1.6.0
-idna==3.1
+ftfy==5.9
+idna==2.10
 irc==19.0.1
 jaraco.classes==3.2.0
 jaraco.collections==3.2.0
@@ -30,12 +32,15 @@ pycparser==2.20
 python-telegram-bot==13.2
 pytz==2021.1
 redis==3.5.3
+requests==2.25.1
 rusyll==0.1.1
 six==1.15.0
+soupsieve==2.2
 tempora==4.0.1
 tornado==6.1
 typing-extensions==3.7.4.3
 tzlocal==2.1
+urllib3==1.26.3
 vine==5.0.0
 wcwidth==0.2.5
 yarl==1.6.3
