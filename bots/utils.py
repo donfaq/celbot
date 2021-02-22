@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from celery import Celery
 
 
@@ -13,3 +15,6 @@ class CeleryWrapper:
 
     def news(self):
         return self.celery.send_task("breaking_mad").get()
+
+    def save_msg(self, dt: datetime, source: str, author: str, text: str):
+        self.celery.send_task("save_msg", args=[dt, source, author, text])

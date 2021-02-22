@@ -2,7 +2,7 @@ import os
 
 from celery import Celery
 
-from engine.tasks import GreetingTask, HaikuDetector, AnekdotTask, BreakingMadTask
+from engine.tasks import GreetingTask, HaikuDetector, AnekdotTask, BreakingMadTask, SaveMessageTask
 
 app = Celery(
     'engine',
@@ -18,6 +18,7 @@ app.register_task(GreetingTask)
 app.register_task(HaikuDetector)
 app.register_task(AnekdotTask)
 app.register_task(BreakingMadTask)
+app.register_task(SaveMessageTask)
 
 if __name__ == '__main__':
     app.start()

@@ -1,3 +1,4 @@
+import os
 import secrets
 
 import cachetools.func
@@ -7,6 +8,8 @@ from bs4 import BeautifulSoup
 from celery import Task
 from celery.utils.log import get_task_logger
 from rusyll import rusyll
+
+from engine.database import DatabaseWrapper
 
 logger = get_task_logger(__name__)
 
@@ -121,3 +124,14 @@ class BreakingMadTask(Task):
         if res:
             text = res
         return text
+
+
+class SaveMessageTask(Task):
+    name = "save_msg"
+    ignore_result = True
+
+    def __init__(self):
+        self.db = DatabaseWrapper(os.getenv("DATABASE_URL"))
+
+    def run(self, dt, source: str, author: str, text: str, *args, **kwargs):
+        self.db.save_new_message(dt=dt, source=source, author=author, text=text)
