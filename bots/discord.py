@@ -19,6 +19,10 @@ class DiscordBot(discord.Client):
             text=message.content
         )
 
+    def __get_predicate(self, message: discord.Message):
+        words = message.content.split()
+        return words[1] if len(words) > 1 else None
+
     async def on_message(self, message: discord.Message):
         self.logger.info("MSG:[%s#%s@%s]:'%s'", message.guild, message.channel, message.author.name, message.content)
         if message.author.id == self.user.id:
@@ -27,5 +31,11 @@ class DiscordBot(discord.Client):
             await message.reply(self.celery.news())
         elif message.content.startswith("!joke"):
             await message.reply(self.celery.joke())
+        elif message.content.startswith("!speak"):
+            await message.reply(self.celery.speak(self.__get_predicate(message)))
+        elif message.content.startswith("!kalik"):
+            await message.reply(self.celery.kalik(self.__get_predicate(message)))
+        elif message.content.startswith("!pron"):
+            await message.reply(self.celery.pron(self.__get_predicate(message)))
         else:
             self.__save_msg(message)

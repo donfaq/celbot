@@ -58,6 +58,23 @@ def news_callback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(celery.news(), reply_to_message_id=update.message.message_id)
 
 
+def get_predicate(update: Update):
+    words = update.message.text.split()
+    return words[1] if len(words) > 1 else None
+
+
+def speak_callback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(celery.speak(get_predicate(update)), reply_to_message_id=update.message.message_id)
+
+
+def kalik_callback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(celery.kalik(get_predicate(update)), reply_to_message_id=update.message.message_id)
+
+
+def pron_callback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(celery.pron(get_predicate(update)), reply_to_message_id=update.message.message_id)
+
+
 def create_bot() -> Updater:
     """Start the bot."""
     updater = Updater(BOT_TOKEN, use_context=True)
@@ -65,6 +82,9 @@ def create_bot() -> Updater:
     dp.add_handler(CommandHandler("start", bot_start_callback))
     dp.add_handler(CommandHandler("joke", joke_callback))
     dp.add_handler(CommandHandler("news", news_callback))
+    dp.add_handler(CommandHandler("speak", speak_callback))
+    dp.add_handler(CommandHandler("kalik", kalik_callback))
+    dp.add_handler(CommandHandler("pron", pron_callback))
     dp.add_error_handler(error_callback)
     return updater
 

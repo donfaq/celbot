@@ -10,6 +10,7 @@ from celery import Task
 from celery.utils.log import get_task_logger
 from rusyll import rusyll
 
+from engine.chain import MarkovifyWrapper
 from engine.database import DatabaseWrapper
 from engine.files import StorageManager
 
@@ -139,11 +140,39 @@ class SaveMessageTask(Task):
         self.db.save_new_message(dt=dt, source=source, author=author, text=text)
 
 
-class GetModelsFolder(Task):
-    name = "get_models"
+class SpeakTask(Task):
+    name = "speak"
 
     def __init__(self):
         self.storage = StorageManager(os.getenv("DROPBOX_TOKEN"))
+        self.db = DatabaseWrapper(os.getenv("DATABASE_URL"))
 
-    def run(self, *args, **kwargs) -> str:
-        return str(self.storage.get_local_folder())
+        self.models_folder = pathlib.Path(self.storage.get_local_folder()).joinpath("chat_model")
+        self.chain = MarkovifyWrapper(self.models_folder, self.db)
+
+    def run(self, predicate: str = None, *args, **kwargs):
+        return self.chain.generate(predicate=predicate)
+
+
+class PronTask(Task):
+    name = "pron"
+
+    def __init__(self):
+        self.storage = StorageManager(os.getenv("DROPBOX_TOKEN"))
+        self.models_folder = pathlib.Path(self.storage.get_local_folder()).joinpath("pron_model")
+        self.chain = MarkovifyWrapper(self.models_folder)
+
+    def run(self, predicate: str = None, *args, **kwargs):
+        return self.chain.generate(predicate=predicate)
+
+
+class KalikTask(Task):
+    name = "kalik"
+
+    def __init__(self):
+        self.storage = StorageManager(os.getenv("DROPBOX_TOKEN"))
+        self.models_folder = pathlib.Path(self.storage.get_local_folder()).joinpath("kalik_model")
+        self.chain = MarkovifyWrapper(self.models_folder)
+
+    def run(self, predicate: str = None, *args, **kwargs):
+        return self.chain.generate(predicate=predicate)

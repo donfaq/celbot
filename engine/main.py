@@ -2,13 +2,22 @@ import os
 
 from celery import Celery
 
-from engine.tasks import GreetingTask, HaikuDetector, AnekdotTask, BreakingMadTask, SaveMessageTask, GetModelsFolder
+from engine.tasks import (
+    GreetingTask,
+    HaikuDetector,
+    AnekdotTask,
+    BreakingMadTask,
+    SaveMessageTask,
+    SpeakTask,
+    PronTask,
+    KalikTask
+)
 
 app = Celery(
     'engine',
     broker=os.getenv("REDIS_URL"),
     backend=os.getenv("REDIS_URL"),
-    include=['engine.tasks']
+    include=['engine']
 )
 app.conf.update(
     result_expires=3600,
@@ -19,7 +28,9 @@ app.register_task(HaikuDetector)
 app.register_task(AnekdotTask)
 app.register_task(BreakingMadTask)
 app.register_task(SaveMessageTask)
-app.register_task(GetModelsFolder)
+app.register_task(SpeakTask)
+app.register_task(PronTask)
+app.register_task(KalikTask)
 
 if __name__ == '__main__':
     app.start()
