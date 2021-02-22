@@ -50,13 +50,14 @@ class HaikuDetector(Task):
 class AnekdotTask(Task):
     name = "anekdot"
 
-    @cachetools.func.ttl_cache(maxsize=10, ttl=6000)
     def _get_random_anekdots(self):
         def parse_html(text):
             return list(map(lambda x: x.text, BeautifulSoup(text, features="html.parser").select("div[class=text]")))
 
+        url = "https://www.anekdot.ru/random/anekdot/"
+        logger.info("Executing GET to %s")
         res = []
-        r = requests.get("https://www.anekdot.ru/random/anekdot/", headers={"User-Agent": "Mozilla/5.0"})
+        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
         if r.ok:
             res = parse_html(r.text)
         return res
@@ -84,6 +85,7 @@ class AnekdotTask(Task):
 class BreakingMadTask(Task):
     name = "breaking_mad"
 
+    @cachetools.func.ttl_cache(maxsize=10, ttl=6000)
     def _download_popular_page(self, n=1) -> str:
         url = "http://breakingmad.me/ru/popular/"
         logger.info("Executing GET to %s?page=%s", url, n)
@@ -93,7 +95,6 @@ class BreakingMadTask(Task):
             res = r.text
         return res
 
-    @cachetools.func.ttl_cache(maxsize=10, ttl=6000)
     def _extract_news(self, raw_html):
         soup = BeautifulSoup(raw_html, features="html.parser")
 
