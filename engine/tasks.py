@@ -1,4 +1,5 @@
 import os
+import pathlib
 import secrets
 
 import cachetools.func
@@ -10,6 +11,7 @@ from celery.utils.log import get_task_logger
 from rusyll import rusyll
 
 from engine.database import DatabaseWrapper
+from engine.files import StorageManager
 
 logger = get_task_logger(__name__)
 
@@ -135,3 +137,13 @@ class SaveMessageTask(Task):
 
     def run(self, dt, source: str, author: str, text: str, *args, **kwargs):
         self.db.save_new_message(dt=dt, source=source, author=author, text=text)
+
+
+class GetModelsFolder(Task):
+    name = "get_models"
+
+    def __init__(self):
+        self.storage = StorageManager(os.getenv("DROPBOX_TOKEN"))
+
+    def run(self, *args, **kwargs) -> str:
+        return str(self.storage.get_local_folder())
