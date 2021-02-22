@@ -23,10 +23,9 @@ class DiscordBot(discord.Client):
         self.logger.info("MSG:[%s#%s@%s]:'%s'", message.guild, message.channel, message.author.name, message.content)
         if message.author.id == self.user.id:
             return
-
-        if message.content.startswith('!news'):
+        elif message.content.startswith('!news'):
             await message.reply(self.celery.news())
-        if message.content.startswith("!joke"):
+        elif message.content.startswith("!joke"):
             await message.reply(self.celery.joke())
-
-        self.__save_msg(message)
+        else:
+            self.__save_msg(message)
