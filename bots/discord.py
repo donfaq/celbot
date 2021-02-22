@@ -14,7 +14,7 @@ class DiscordBot(discord.Client):
     def __save_msg(self, message: discord.Message):
         self.celery.save_msg(
             dt=message.created_at,
-            source=f"{message.guild.name}#{message.channel.name}",
+            source=f"{message.guild}#{message.channel}",
             author=f"{message.author.name}#{message.author.discriminator}",
             text=message.content
         )
