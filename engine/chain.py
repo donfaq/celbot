@@ -9,13 +9,13 @@ from engine.database import DatabaseWrapper
 class MarkovifyWrapper:
     def __init__(self, models_folder: pathlib.Path, db: DatabaseWrapper = None):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.__saved_model = self.__load_saved_model(models_folder)
+        self.__models_folder = models_folder
         self.__max_size = 200
         self.db = db
 
-    def __load_saved_model(self, models_folder: pathlib.Path):
+    def __load_saved_model(self):
         models = []
-        for model_path in models_folder.glob("*.json"):
+        for model_path in self.__models_folder.glob("*.json"):
             self.logger.info("Reading model from file '%s'", model_path)
             with open(model_path, mode='r') as model_file:
                 model_raw_json = model_file.read()
@@ -31,7 +31,7 @@ class MarkovifyWrapper:
         )
 
     def __get_current_model(self):
-        model = self.__saved_model
+        model = self.__load_saved_model()
         if self.db:
             model = markovify.combine(models=[model, self.__model_from_db()], weights=[1, 1.5])
         return model.compile()
