@@ -12,6 +12,7 @@ class MarkovifyWrapper:
         self.__models_folder = models_folder
         self.__max_size = 200
         self.db = db
+        self.__saved_model = self.__load_saved_model()
 
     def __load_saved_model(self):
         models = []
@@ -31,7 +32,7 @@ class MarkovifyWrapper:
         )
 
     def __get_current_model(self):
-        model = self.__load_saved_model()
+        model = self.__saved_model
         if self.db:
             model = markovify.combine(models=[model, self.__model_from_db()], weights=[1, 1.5])
         return model.compile()

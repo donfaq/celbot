@@ -1,8 +1,8 @@
-import logging
 import pathlib
 import tempfile
 
 import dropbox
+from celery.utils.log import get_task_logger
 from dropbox.files import FileMetadata
 
 
@@ -11,7 +11,7 @@ class StorageManager:
     __local_folder: pathlib.Path = None
 
     def __init__(self, access_token):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = get_task_logger(self.__class__.__name__)
         self.dbx = dropbox.Dropbox(access_token)
 
     def __download_remote_folder(self) -> pathlib.Path:

@@ -1,4 +1,4 @@
-import logging
+from celery.utils.log import get_task_logger
 
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy import create_engine
@@ -22,7 +22,7 @@ class Message(Base):
 
 class DatabaseWrapper:
     def __init__(self, database_url):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = get_task_logger(self.__class__.__name__)
         self.logger.info("Connecting to database")
         self.engine = create_engine(database_url, echo=True)
         self.logger.info("Successfully connected to DB. Creating structure")
