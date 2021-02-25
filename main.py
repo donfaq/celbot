@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from bots import DiscordBot, start_telegram_bot, TwitchBot
+from bot.clients import DiscordBot, start_telegram_bot, TwitchBot
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 

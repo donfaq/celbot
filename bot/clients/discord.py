@@ -2,7 +2,7 @@ import logging
 
 import discord
 
-from bots.utils import CeleryWrapper
+from bot.clients.utils import CeleryWrapper
 
 
 class DiscordBot(discord.Client):

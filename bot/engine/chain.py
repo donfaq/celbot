@@ -3,7 +3,7 @@ import pathlib
 
 import markovify
 
-from engine.database import DatabaseWrapper
+from bot.engine.database import DatabaseWrapper
 
 
 class MarkovifyWrapper:

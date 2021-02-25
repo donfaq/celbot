@@ -3,7 +3,7 @@ import logging
 import irc.bot
 from irc.client import MessageTooLong
 
-from bots.utils import CeleryWrapper
+from bot.clients.utils import CeleryWrapper
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):

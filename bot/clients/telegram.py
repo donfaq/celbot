@@ -8,7 +8,7 @@ import traceback
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, CallbackContext, Dispatcher
 
-from bots.utils import CeleryWrapper
+from bot.clients.utils import CeleryWrapper
 
 logger = logging.getLogger(__name__)
 

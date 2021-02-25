@@ -5,10 +5,10 @@ from celery import current_app
 from celery.utils.log import get_task_logger
 from rusyll import rusyll
 
-from engine.chain import MarkovifyWrapper
-from engine.database import DatabaseWrapper
-from engine.files import StorageManager
-from engine.parsers import AnekdotRuParser, BreakingMadParser
+from bot.engine.chain import MarkovifyWrapper
+from bot.engine.database import DatabaseWrapper
+from bot.engine.files import StorageManager
+from bot.engine.parsers import AnekdotRuParser, BreakingMadParser
 
 logger = get_task_logger(__name__)
 storage = StorageManager(os.getenv("DROPBOX_TOKEN"))
