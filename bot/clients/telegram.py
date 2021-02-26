@@ -4,8 +4,8 @@ import logging
 import os
 import traceback
 
-from telegram import Update, ParseMode
-from telegram.ext import Updater, CommandHandler, CallbackContext, Dispatcher
+from telegram import Update, ParseMode, Message
+from telegram.ext import Updater, CommandHandler, CallbackContext, Dispatcher, MessageHandler, Filters
 
 from bot.clients.utils import CeleryWrapper
 
@@ -66,6 +66,19 @@ def pron_callback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(celery.pron(get_predicate(update)), reply_to_message_id=update.message.message_id)
 
 
+def text_message_callback(update: Update, context: CallbackContext) -> None:
+    message: Message = update.message
+    author = f"{message.from_user.username}" if message.from_user else \
+        f"id={message.sender_chat.id}#type={message.sender_chat.type}#title={message.sender_chat.title}"
+    chat_title = f"{message.chat.title}" if message.chat.title else f"{message.chat.username}"
+    celery.save_msg(
+        dt=message.date,
+        source=f"telegram#id={message.chat_id}#type={message.chat.type}#title={chat_title}",
+        author=author,
+        text=message.text
+    )
+
+
 def create_bot() -> Updater:
     """Start the bot."""
     updater = Updater(BOT_TOKEN, use_context=True)
@@ -76,6 +89,7 @@ def create_bot() -> Updater:
     dp.add_handler(CommandHandler("speak", speak_callback))
     dp.add_handler(CommandHandler("kalik", kalik_callback))
     dp.add_handler(CommandHandler("pron", pron_callback))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, text_message_callback))
     dp.add_error_handler(error_callback)
     return updater
 
