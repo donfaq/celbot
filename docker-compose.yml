@@ -1,0 +1,63 @@
+version: "3.9"
+services:
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    networks:
+      - internal
+  postgres:
+    image: postgres:13.2-alpine
+    environment:
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_DB=postgres"
+      - "POSTGRES_PASSWORD=postgres"
+    networks:
+      - internal
+  engine:
+    image: celbot:latest
+    build:
+      context: .
+    environment:
+      - "REDIS_URL=redis://redis:6379/0"
+      - "DROPBOX_TOKEN=${DROPBOX_TOKEN}"
+      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+    entrypoint: [ "celery", "-A", "bot.engine.main", "worker", "-l", "INFO", "-c", "2" ]
+    networks:
+      - internal
+  telegram-bot:
+    image: celbot:latest
+    build:
+      context: .
+    environment:
+      - "REDIS_URL=redis://redis:6379/0"
+      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}"
+    entrypoint: [ "python", "main.py", "telegram" ]
+    networks:
+      - internal
+  discord-bot:
+    image: celbot:latest
+    build:
+      context: .
+    environment:
+      - "REDIS_URL=redis://redis:6379/0"
+      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "DISCORD_TOKEN=${DISCORD_TOKEN}"
+    entrypoint: [ "python", "main.py", "discord" ]
+    networks:
+      - internal
+  twitch-bot:
+    image: celbot:latest
+    build:
+      context: .
+    environment:
+      - "REDIS_URL=redis://redis:6379/0"
+      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "TWITCH_USERNAME=${TWITCH_USERNAME}"
+      - "TWITCH_TOKEN=${TWITCH_TOKEN}"
+      - "TWITCH_CHANNEL=${TWITCH_CHANNEL}"
+    entrypoint: [ "python", "main.py", "twitch" ]
+    networks:
+      - internal
+networks:
+  internal:

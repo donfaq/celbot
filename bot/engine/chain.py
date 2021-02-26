@@ -26,16 +26,16 @@ class MarkovifyWrapper:
     def __model_from_db(self):
         self.logger.info("Selecting all texts from DB")
         texts = self.db.select_all_texts()
-        return markovify.Text(
-            input_text=". ".join(map(lambda x: x[0], texts)),
-            retain_original=False
-        )
+        texts = ". ".join(map(lambda x: x[0], texts))
+        return markovify.Text(input_text=texts, retain_original=False) if texts else None
 
     def __get_current_model(self):
-        model = self.__saved_model
+        saved_model = self.__saved_model
         if self.db:
-            model = markovify.combine(models=[model, self.__model_from_db()], weights=[1, 1.5])
-        return model.compile()
+            db_model = self.__model_from_db()
+            if db_model:
+                saved_model = markovify.combine(models=[saved_model, db_model], weights=[1, 1.5])
+        return saved_model.compile()
 
     def generate(self, predicate=None):
         message = None

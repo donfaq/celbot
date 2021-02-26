@@ -1,6 +1,9 @@
+import logging
 import os
 
 from celery import Celery
+
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
 app = Celery(
     'engine',

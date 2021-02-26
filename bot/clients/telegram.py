@@ -1,4 +1,3 @@
-import argparse
 import html
 import json
 import logging
@@ -13,17 +12,9 @@ from bot.clients.utils import CeleryWrapper
 logger = logging.getLogger(__name__)
 
 BOT_TOKEN = str(os.getenv("TELEGRAM_TOKEN", "token"))
-PUBLIC_PORT = int(os.getenv("PORT", '8080'))
-PUBLIC_URL = os.getenv("PUBLIC_URL", "localhost")
 DEVELOPER_CHAT_ID = int(os.getenv("DEV_CHAT_ID", 998969))
 
 celery = CeleryWrapper(broker_uri=os.getenv("REDIS_URL"))
-
-
-def arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--mode", default="server", required=False, choices=["server", "local"])
-    return parser.parse_args()
 
 
 def bot_start_callback(update: Update, context: CallbackContext) -> None:
@@ -89,33 +80,8 @@ def create_bot() -> Updater:
     return updater
 
 
-def run_webhook(updater: Updater) -> None:
-    logger.info("Starting bot in webhook mode")
-
-    webhook_url = "/".join((PUBLIC_URL.strip("/"), BOT_TOKEN))
-    updater.start_webhook(listen="0.0.0.0", port=PUBLIC_PORT, url_path=BOT_TOKEN)
-    updater.bot.set_webhook(webhook_url)
-    updater.idle()
-
-
-def run_polling(updater: Updater) -> None:
+def start_telegram_bot() -> None:
+    updater = create_bot()
     logger.info("Starting bot in polling mode")
     updater.start_polling()
     updater.idle()
-
-
-def start_telegram_bot():
-    run_webhook(create_bot())
-
-
-def main():
-    args = arguments()
-
-    if args.mode == "server":
-        run_webhook(create_bot())
-    else:
-        run_polling(create_bot())
-
-
-if __name__ == '__main__':
-    main()
