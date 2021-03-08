@@ -17,6 +17,7 @@ local_folder = pathlib.Path(storage.get_local_folder())
 chat_model_chain = MarkovifyWrapper(local_folder.joinpath("chat_model"), database_wrapper)
 kalik_model_chain = MarkovifyWrapper(local_folder.joinpath("kalik_model"))
 pron_model_chain = MarkovifyWrapper(local_folder.joinpath("pron_model"))
+gachi_horoscope_model_chain = MarkovifyWrapper(local_folder.joinpath("gachi_horoscope_model"))
 anekdot_parser = AnekdotRuParser()
 breaking_mad_parser = BreakingMadParser()
 
@@ -70,10 +71,15 @@ def speak(predicate: str = None):
 
 
 @current_app.task(name="pron")
-def speak(predicate: str = None):
+def pron(predicate: str = None):
     return pron_model_chain.generate(predicate=predicate)
 
 
 @current_app.task(name="kalik")
-def speak(predicate: str = None):
+def kalik(predicate: str = None):
     return kalik_model_chain.generate(predicate=predicate)
+
+
+@current_app.task(name="gachi_horo")
+def gachi_horo(predicate: str = None, max_size: int = None):
+    return gachi_horoscope_model_chain.generate(predicate=predicate, max_size=max_size)

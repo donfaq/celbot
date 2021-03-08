@@ -1,7 +1,8 @@
 import logging
+from datetime import datetime
 
 import irc.bot
-from irc.client import MessageTooLong
+import irc.strings
 
 from bot.clients.utils import CeleryWrapper
 
@@ -26,14 +27,55 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.join(self.channel)
         self.log.info("Successfully joined to {}".format(self.channel))
 
-    def _author(self, msg_object):
-        return msg_object.source.split("!")[0]
+    def __author(self, event):
+        return event.source.split("!")[0]
 
-    def on_pubmsg(self, c, e):
-        reaction_msg = self.celery.greet(self._author(e))
+    def __msg(self, event):
+        return event.arguments[0]
+
+    def __predicate(self, msg):
+        words = msg.split()
+        return words[1] if len(words) > 1 else None
+
+    def __get_ts(self, event):
+        for tag in event.tags:
+            if tag["key"] == 'tmi-sent-ts':
+                return datetime.utcfromtimestamp(float(tag["value"]) / 1000)
+
+    def __save_msg(self, event):
+        self.celery.save_msg(
+            dt=self.__get_ts(event),
+            source=f"twitch{self.channel}",
+            author=self.__author(event),
+            text=self.__msg(event)
+        )
+
+    def __send_message(self, text):
+        self.connection.privmsg(self.channel, text)
+
+    def on_pubmsg(self, connection, event):
         try:
-            self.connection.privmsg(self.channel, reaction_msg)
-        except irc.client.MessageTooLong:
-            self.log.exception(f"Message: '{reaction_msg}' seems to be too long for Twitch")
-        except Exception:
-            self.log.exception(f"Error sending message: '{reaction_msg}'")
+            author = self.__author(event)
+            msg = self.__msg(event)
+            if len(msg) > 0:
+                if msg.startswith("!"):
+                    self.log.info(f"Reacting to command from user @{author}: '{msg}'")
+                    if msg.startswith("!news"):
+                        self.__send_message(self.celery.news())
+                    elif msg.startswith("!joke"):
+                        self.__send_message(self.celery.joke())
+                    elif msg.startswith("!kalik"):
+                        self.__send_message(self.celery.kalik(predicate=self.__predicate(msg)))
+                    elif msg.startswith("!pron"):
+                        self.__send_message(self.celery.pron(predicate=self.__predicate(msg)))
+                    elif msg.startswith("!speak"):
+                        self.__send_message(self.celery.speak(predicate=self.__predicate(msg)))
+                    elif msg.startswith("!gachi"):
+                        self.__send_message(self.celery.gachi_horo(max_size=250))
+                    else:
+                        self.__send_message(f"@{author} нет такой команды")
+                else:
+                    self.log.info(f"Saving msg @{author}:'{msg}'")
+                    self.__save_msg(event)
+        except Exception as e:
+            self.log.exception("Unexpected error", e)

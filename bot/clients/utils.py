@@ -25,5 +25,8 @@ class CeleryWrapper:
     def kalik(self, predicate: str = None):
         return self.celery.send_task("kalik", [predicate]).get()
 
+    def gachi_horo(self, predicate: str = None, max_size: int = None):
+        return self.celery.send_task("gachi_horo", [predicate, max_size]).get()
+
     def save_msg(self, dt: datetime, source: str, author: str, text: str):
         self.celery.send_task("save_msg", args=[dt, source, author, text])

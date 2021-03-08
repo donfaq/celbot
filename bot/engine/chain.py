@@ -10,7 +10,6 @@ class MarkovifyWrapper:
     def __init__(self, models_folder: pathlib.Path, db: DatabaseWrapper = None):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__models_folder = models_folder
-        self.__max_size = 200
         self.db = db
         self.__saved_model = self.__load_saved_model()
 
@@ -37,7 +36,7 @@ class MarkovifyWrapper:
                 saved_model = markovify.combine(models=[saved_model, db_model], weights=[1, 1.5])
         return saved_model.compile()
 
-    def generate(self, predicate=None):
+    def generate(self, predicate=None, max_size=140):
         message = None
         model = self.__get_current_model()
         if model:
@@ -47,12 +46,16 @@ class MarkovifyWrapper:
                     message = model.make_sentence_with_start(predicate, strict=False)
                     if not message:
                         raise KeyError
-                    if len(message) > self.__max_size * 2:
-                        raise KeyError
+                    if max_size:
+                        if len(message) > max_size * 2:
+                            raise KeyError
             except (KeyError, markovify.text.ParamError):
                 self.logger.debug("No such token in corpus: {}".format(predicate))
-            if not message:
+            if not message and max_size is not None:
                 self.logger.debug("Generating short message")
-                message = model.make_short_sentence(self.__max_size)
-        message = "I have nothing to say yet" if not message else message
+                message = model.make_short_sentence(max_size)
+            if not message and max_size is None:
+                self.logger.debug("Generating short message")
+                message = model.make_sentence()
+        message = "I have nothing to say" if not message else message
         return message

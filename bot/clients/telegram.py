@@ -66,6 +66,10 @@ def pron_callback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(celery.pron(get_predicate(update)), reply_to_message_id=update.message.message_id)
 
 
+def gachi_callback(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(celery.gachi_horo(get_predicate(update)), reply_to_message_id=update.message.message_id)
+
+
 def text_message_callback(update: Update, context: CallbackContext) -> None:
     message: Message = update.message
     author = f"{message.from_user.username}" if message.from_user else \
@@ -89,6 +93,7 @@ def create_bot() -> Updater:
     dp.add_handler(CommandHandler("speak", speak_callback))
     dp.add_handler(CommandHandler("kalik", kalik_callback))
     dp.add_handler(CommandHandler("pron", pron_callback))
+    dp.add_handler(CommandHandler("gachi", gachi_callback))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, text_message_callback))
     dp.add_error_handler(error_callback)
     return updater

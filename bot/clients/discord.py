@@ -37,5 +37,7 @@ class DiscordBot(discord.Client):
             await message.reply(self.celery.kalik(self.__get_predicate(message)))
         elif message.content.startswith("!pron"):
             await message.reply(self.celery.pron(self.__get_predicate(message)))
+        elif message.content.startswith("!gachi"):
+            await message.reply(self.celery.gachi_horo(self.__get_predicate(message)))
         else:
             self.__save_msg(message)
