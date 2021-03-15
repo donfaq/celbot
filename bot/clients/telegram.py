@@ -4,8 +4,9 @@ import logging
 import os
 import traceback
 
-from telegram import Update, ParseMode, Message
-from telegram.ext import Updater, CommandHandler, CallbackContext, Dispatcher, MessageHandler, Filters
+from telegram import Update, ParseMode, Message, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackContext, Dispatcher, MessageHandler, Filters, \
+    CallbackQueryHandler
 
 from bot.clients.utils import CeleryWrapper
 
@@ -46,7 +47,26 @@ def joke_callback(update: Update, context: CallbackContext) -> None:
 
 
 def news_callback(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(celery.news(), reply_to_message_id=update.message.message_id)
+    keyboard = [[InlineKeyboardButton(str(i), callback_data=str(i)) for i in range(1, 6)]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text(
+        "\n".join(f"""{entry["n"]}. {entry["title"]}""" for entry in celery.ynews()),
+        reply_markup=reply_markup,
+    )
+
+
+def news_button(update: Update, _: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+
+    text = None
+    news = celery.ynews()
+    num = int(query.data)
+    for entry in news:
+        if entry["n"] == num:
+            text = f"""{entry["annotation"]}\n{entry["link"]}"""
+            break
+    query.edit_message_text(text=text)
 
 
 def get_predicate(update: Update):
@@ -89,11 +109,12 @@ def create_bot() -> Updater:
     dp: Dispatcher = updater.dispatcher
     dp.add_handler(CommandHandler("start", bot_start_callback))
     dp.add_handler(CommandHandler("joke", joke_callback))
-    dp.add_handler(CommandHandler("news", news_callback))
     dp.add_handler(CommandHandler("speak", speak_callback))
     dp.add_handler(CommandHandler("kalik", kalik_callback))
     dp.add_handler(CommandHandler("pron", pron_callback))
     dp.add_handler(CommandHandler("gachi", gachi_callback))
+    dp.add_handler(CommandHandler("news", news_callback))
+    dp.add_handler(CallbackQueryHandler(news_button))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, text_message_callback))
     dp.add_error_handler(error_callback)
     return updater

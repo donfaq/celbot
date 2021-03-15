@@ -30,3 +30,6 @@ class CeleryWrapper:
 
     def save_msg(self, dt: datetime, source: str, author: str, text: str):
         self.celery.send_task("save_msg", args=[dt, source, author, text])
+
+    def ynews(self):
+        return self.celery.send_task("ynews").get()

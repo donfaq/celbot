@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime
 
 import cachetools.func
 import ftfy
@@ -9,6 +10,10 @@ from celery.utils.log import get_task_logger
 
 def rand_choice(seq):
     return secrets.SystemRandom().choice(seq)
+
+
+def get_short_link(url: str):
+    return requests.get(f"https://clck.ru/--?url={url}").text
 
 
 class AnekdotRuParser:
@@ -89,3 +94,39 @@ class BreakingMadParser:
         if res:
             text = res
         return text
+
+
+class YNewsParser:
+    __news: list = None
+    __news_updated_at: datetime = None
+
+    def __init__(self):
+        self.logger = get_task_logger(self.__class__.__name__)
+        self.logger.info(f"Initializing {self.__class__.__name__}")
+
+    def __download_news_page(self):
+        self.logger.info("Downloading yandex.ru/news page")
+        return requests.get("https://yandex.ru/news").text
+
+    @staticmethod
+    def __parse_ya_news(text):
+        result = []
+        soup = BeautifulSoup(text, features="html.parser")
+        for i, card in enumerate(soup.select(".mg-card__text-content")[:5], start=1):
+            result.append({
+                "n": i,
+                "title": " ".join(card.select_one(".mg-card__title").text.split()),
+                "link": get_short_link(card.select_one(".mg-card__link")['href'].split("?")[0]),
+                "annotation": " ".join(card.select_one(".mg-card__annotation").text.split())
+            })
+        return result
+
+    @property
+    def top_news(self) -> list:
+        self.logger.info("news=%s; updated_at=%s", self.__news, self.__news_updated_at)
+        if self.__news and self.__news_updated_at:
+            if (datetime.now() - self.__news_updated_at).total_seconds() < 300:
+                return self.__news
+        self.__news = self.__parse_ya_news(self.__download_news_page())
+        self.__news_updated_at = datetime.now()
+        return self.__news

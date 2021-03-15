@@ -8,7 +8,7 @@ from rusyll import rusyll
 from bot.engine.chain import MarkovifyWrapper
 from bot.engine.database import DatabaseWrapper
 from bot.engine.files import StorageManager
-from bot.engine.parsers import AnekdotRuParser, BreakingMadParser
+from bot.engine.parsers import AnekdotRuParser, BreakingMadParser, YNewsParser
 
 logger = get_task_logger(__name__)
 storage = StorageManager(os.getenv("DROPBOX_TOKEN"))
@@ -20,6 +20,7 @@ pron_model_chain = MarkovifyWrapper(local_folder.joinpath("pron_model"))
 gachi_horoscope_model_chain = MarkovifyWrapper(local_folder.joinpath("gachi_horoscope_model"))
 anekdot_parser = AnekdotRuParser()
 breaking_mad_parser = BreakingMadParser()
+ynews = YNewsParser()
 
 
 @current_app.task(name="greet")
@@ -53,6 +54,11 @@ def haiku(text: str):
 @current_app.task(name="breaking_mad")
 def breaking_mad():
     return breaking_mad_parser.get_random_news()
+
+
+@current_app.task(name="ynews")
+def news():
+    return ynews.top_news
 
 
 @current_app.task(name="anekdot")
