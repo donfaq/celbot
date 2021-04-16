@@ -1,5 +1,5 @@
 aiohttp==3.7.4
-amqp==5.0.5
+amqp==5.0.6
 APScheduler==3.6.3
 async-timeout==3.0.1
 attrs==20.3.0
@@ -15,9 +15,12 @@ click-didyoumean==0.0.3
 click-plugins==1.1.1
 click-repl==0.1.6
 cryptography==3.4.6
-discord.py==1.6.0
-dropbox==11.2.0
-ftfy==5.9
+discord.py==1.7.1
+dropbox==11.7.0
+flower==0.9.5
+ftfy==6.0
+future==0.18.2
+humanize==3.2.0
 idna==2.10
 irc==19.0.1
 jaraco.classes==3.2.0
@@ -31,10 +34,11 @@ markovify==0.9.0
 more-itertools==8.7.0
 multidict==5.1.0
 ply==3.11
+prometheus-client==0.8.0
 prompt-toolkit==3.0.16
 psycopg2-binary==2.8.6
 pycparser==2.20
-python-telegram-bot==13.3
+python-telegram-bot==13.4.1
 pytz==2021.1
 redis==3.5.3
 requests==2.25.1
