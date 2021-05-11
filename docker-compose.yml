@@ -10,12 +10,10 @@ services:
     restart: always
     volumes:
       - "${POSTGRES_DATA}:/var/lib/postgresql/data"
-    ports:
-      - "5432:5432"
     environment:
-      - "POSTGRES_USER=postgres"
-      - "POSTGRES_DB=postgres"
-      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_DB=${POSTGRES_DB}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     networks:
       - internal
   engine:
@@ -26,7 +24,7 @@ services:
     environment:
       - "REDIS_URL=redis://redis:6379/0"
       - "DROPBOX_TOKEN=${DROPBOX_TOKEN}"
-      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
     entrypoint: [ "celery", "-A", "bot.engine.main", "worker", "-l", "INFO", "-c", "2" ]
     networks:
       - internal
@@ -37,7 +35,7 @@ services:
       context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
-      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       - "TELEGRAM_TOKEN=${TELEGRAM_TOKEN}"
     entrypoint: [ "python", "main.py", "telegram" ]
     networks:
@@ -49,7 +47,7 @@ services:
       context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
-      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       - "DISCORD_TOKEN=${DISCORD_TOKEN}"
     entrypoint: [ "python", "main.py", "discord" ]
     networks:
@@ -61,7 +59,7 @@ services:
       context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
-      - "DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres"
+      - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       - "TWITCH_USERNAME=${TWITCH_USERNAME}"
       - "TWITCH_TOKEN=${TWITCH_TOKEN}"
       - "TWITCH_CHANNEL=${TWITCH_CHANNEL}"
