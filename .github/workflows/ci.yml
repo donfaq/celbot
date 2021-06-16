@@ -53,7 +53,7 @@ jobs:
         run: echo ${{ steps.buildx.outputs.platforms }}
 
       - name: build and deploy master image to ghcr.io and dockerhub
-        if: ${{ github.ref == 'refs/heads/add-ci' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         env:
           GITHUB_PACKAGE_TOKEN: ${{ secrets.PKG_TOKEN }}
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -71,7 +71,7 @@ jobs:
               -t ghcr.io/${USERNAME}/celbot:${ref} -t ${USERNAME}/celbot:${ref} .
 
       - name: ssh-to-server
-        if: ${{ github.ref == 'refs/heads/add-ci' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: appleboy/ssh-action@master
         env:
           GIT_REPO: ${{ github.repository }}
