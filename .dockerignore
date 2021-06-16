@@ -3,3 +3,5 @@ runtime.txt
 Procfile
 .git
 .gitignore
+docs/
+*.md
