@@ -17,10 +17,8 @@ services:
     networks:
       - internal
   engine:
-    image: celbot:latest
+    image: ghcr.io/donfaq/celbot:master
     restart: always
-    build:
-      context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
       - "DROPBOX_TOKEN=${DROPBOX_TOKEN}"
@@ -29,10 +27,8 @@ services:
     networks:
       - internal
   telegram-bot:
-    image: celbot:latest
+    image: ghcr.io/donfaq/celbot:master
     restart: always
-    build:
-      context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
       - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
@@ -41,10 +37,8 @@ services:
     networks:
       - internal
   discord-bot:
-    image: celbot:latest
+    image: ghcr.io/donfaq/celbot:master
     restart: always
-    build:
-      context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
       - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
@@ -53,10 +47,8 @@ services:
     networks:
       - internal
   twitch-bot:
-    image: celbot:latest
+    image: ghcr.io/donfaq/celbot:master
     restart: always
-    build:
-      context: .
     environment:
       - "REDIS_URL=redis://redis:6379/0"
       - "DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
